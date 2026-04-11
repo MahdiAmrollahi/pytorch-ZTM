@@ -14,5 +14,4 @@ def save_model(model: torch.nn.Module,
     model_save_path = target_dir_path / model_name
 
     print(f"[INFO] Saving model to: {model_save_path}")
-    torch.save(obj=model.parameters(), f=model_save_path)
-
+    torch.save(obj=model.state_dict(), f=model_save_path)
