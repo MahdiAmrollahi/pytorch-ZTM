@@ -3,13 +3,15 @@ from tqdm.auto import tqdm
 
 import torch
 
-device = 'cuda' if torch.cuda.is_available() else 'cpu' 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
 # Creaet train_step()
+
+
 def train_step(model: torch.nn.Module,
-                dataloader: torch.utils.data.DataLoader,
-                loss_fn: torch.nn.Module,
-                optimizer: torch.optim.Optimizer,
-                device=device):
+               dataloader: torch.utils.data.DataLoader,
+               loss_fn: torch.nn.Module,
+               optimizer: torch.optim.Optimizer,
+               device=device):
 
     model.train()
 
@@ -31,7 +33,7 @@ def train_step(model: torch.nn.Module,
 
         # Calculate accuracy
         y_pred_class = torch.argmax(torch.softmax(y_pred, dim=1), dim=1)
-        train_acc += (y_pred_class==y).sum().item() / len(y_pred)
+        train_acc += (y_pred_class == y).sum().item() / len(y_pred)
 
     # Adjust metrics to get AVG loss/accuracy
     train_loss /= len(dataloader)
@@ -39,10 +41,12 @@ def train_step(model: torch.nn.Module,
     return train_loss, train_acc
 
 # Create test_step()
+
+
 def test_step(model: torch.nn.Module,
-                dataloader: torch.utils.data.DataLoader,
-                loss_fn: torch.nn.Module,
-                device=device):
+              dataloader: torch.utils.data.DataLoader,
+              loss_fn: torch.nn.Module,
+              device=device):
 
     model.eval()
 
@@ -57,7 +61,8 @@ def test_step(model: torch.nn.Module,
             loss = loss_fn(test_pred_logits, y)
             test_loss += loss.item()
 
-            test_pred_labels = torch.argmax(torch.softmax(test_pred_logits, dim=1), dim=1)
+            test_pred_labels = torch.argmax(
+                torch.softmax(test_pred_logits, dim=1), dim=1)
             test_acc += (test_pred_labels == y).sum().item() / len(y)
 
     # Adjust metrics to get AVG loss/accuracy
@@ -65,25 +70,26 @@ def test_step(model: torch.nn.Module,
     test_acc /= len(dataloader)
     return test_loss, test_acc
 
+
 def train(model: torch.nn.Module,
-            train_dataloader: torch.utils.data.DataLoader,
-            test_dataloader: torch.utils.data.DataLoader,
-            optimizer: torch.optim.Optimizer,
-            loss_fn: torch.nn.Module,
-            epochs: int=5,
-            device=device):
+          train_dataloader: torch.utils.data.DataLoader,
+          test_dataloader: torch.utils.data.DataLoader,
+          optimizer: torch.optim.Optimizer,
+          loss_fn: torch.nn.Module,
+          epochs: int = 5,
+          device=device):
 
     results = {"train_loss": [],
-                "train_acc": [],
-                "test_loss": [],
-                "test_acc": []}
+               "train_acc": [],
+               "test_loss": [],
+               "test_acc": []}
 
     for epoch in tqdm(range(epochs)):
         train_loss, train_acc = train_step(model=model,
-                                        dataloader=train_dataloader,
-                                        loss_fn=loss_fn,
-                                        optimizer=optimizer,
-                                        device=device)
+                                           dataloader=train_dataloader,
+                                           loss_fn=loss_fn,
+                                           optimizer=optimizer,
+                                           device=device)
 
         test_loss, test_acc = test_step(model=model,
                                         dataloader=test_dataloader,
